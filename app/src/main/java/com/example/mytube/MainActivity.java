@@ -4,8 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.media.Image;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,14 +39,14 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         HideCntrols();
 
         // initiate videoviev and media controller
-        VideoView videoView = findViewById(R.id.vidview);
+        final VideoView videoView = findViewById(R.id.vidview);
         final MediaController mediaController = new MediaController(this);
         mediaController.setAnchorView(videoView);
 
@@ -55,20 +58,55 @@ public class MainActivity extends AppCompatActivity {
         videoView.setVideoURI(uri);
         videoView.requestFocus();
         videoView.start();
-
         videoView.setMediaController(mediaController);
 
-
-        videoView.setOnTouchListener(new View.OnTouchListener() {
+        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            final Context context = getApplicationContext();
 
             @Override
-            public boolean onTouch(View view, MotionEvent event) {
-                VideoClick();
-                mediaController.show(5000);
-
-                return true;
+            public void onCompletion(MediaPlayer mp) {
+                Toast.makeText(context, "DONE !", Toast.LENGTH_SHORT).show();
+                NextClick();
+                videoView.start();
             }
         });
+
+
+        final Context context = getApplicationContext();
+
+        videoView.setOnTouchListener(new OnSwipeTouchListener(MainActivity.this) {
+            public void onSwipeTop() {
+                Toast.makeText(context, "top", Toast.LENGTH_SHORT).show();
+                mediaController.show(5000);
+            }
+
+            public void onSwipeRight() {
+                Toast.makeText(context, "right", Toast.LENGTH_SHORT).show();
+                mediaController.show(5000);
+            }
+
+            public void onSwipeLeft() {
+
+                Intent intent = new Intent(MainActivity.this, SomeActivity.class);
+                startActivity(intent);
+
+                Toast.makeText(context, "left", Toast.LENGTH_SHORT).show();
+                mediaController.show(5000);
+            }
+
+            public void onSwipeBottom() {
+                Toast.makeText(context, "bottom", Toast.LENGTH_SHORT).show();
+                mediaController.show(5000);
+            }
+
+            public void onNoSwipe() {
+                Toast.makeText(context, "Click", Toast.LENGTH_SHORT).show();
+                VideoClick();
+                mediaController.show(5000);
+            }
+
+        });
+
 
         // Initiate my own media controller buttons
         ImageButton playpauseimgbutton = findViewById(R.id.playpauseimagebuton);
@@ -122,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-    /*   for later use maybe
+    /*   for debug puprpurses
         Context context = getApplicationContext();
         Toast toast = Toast.makeText(context,resIDs.length+":"+fields.length ,Toast.LENGTH_LONG);
         toast.show();
