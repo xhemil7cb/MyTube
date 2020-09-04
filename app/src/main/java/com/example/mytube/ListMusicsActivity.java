@@ -5,8 +5,11 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.ListActivity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -21,6 +24,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -32,7 +37,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SomeActivity extends AppCompatActivity {
+public class ListMusicsActivity extends AppCompatActivity {
 
     private static final int MY_PERMISSIONS_REQUEST_EXTERNAL_STORAGE = 100;
     Field[] fields;
@@ -47,50 +52,34 @@ public class SomeActivity extends AppCompatActivity {
 
         checkPermission();
 
+
+        String path = "sdcard/DCIM/SharedFolder";
+        File f = new File(path);
+        File[] filearray = f.listFiles();
+
+
+        ArrayList<Music> Muzikat = new ArrayList<>();
+
+        for (File file : filearray) {
+            Music m = new Music(file.getName());
+            Muzikat.add(m);
+        }
+
+        MusicAdapter musicAdapter = new MusicAdapter(this, Muzikat);
         lv = findViewById(R.id.listView);
-
-        // Instanciating an array list (you don't need to do this,
-        // you already have yours).
-        List<String> your_array_list = new ArrayList<String>();
-
-        ArrayList<Music> musics = new ArrayList<Music>();
-
-        fields = R.raw.class.getFields();
-        for (int i = 0; i < fields.length; i++) {
-            try {
-                String s = getString(fields[i].getInt(fields[i]));
-                int r = fields[i].getInt(fields[i]);
-                Music m = new Music(s, r);
-                musics.add(m);
-
-                //resIDs[i] = (fields[i].getInt(fields[i]));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        MusicAdapter musicAdapter = new MusicAdapter(this, musics);
-
-        int id = 0;
-        try {
-            id = fields[1].getInt(fields[1]);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        ImageView iv = findViewById(R.id.testthumbnail);
-
-
-        //sdcard/DCIM/SharedFolder/blabla.mp4    Bluestacks mp4's Locatin
-/*   Works like a charm keep for reference
-        String path = "sdcard/DCIM/SharedFolder/blabla.mp4";
-        Bitmap bmThumbnail = ThumbnailUtils.createVideoThumbnail(path, MediaStore.Video.Thumbnails.MICRO_KIND);
-        iv.setImageBitmap(bmThumbnail);
-*/
-
-
         lv.setAdapter(musicAdapter);
+
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String selectedItem = (String) parent.getItemAtPosition(position).toString();
+                Context context = getApplicationContext();
+                Toast toast = Toast.makeText(context, selectedItem + "", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
 
 
     }

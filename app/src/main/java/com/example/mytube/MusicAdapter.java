@@ -33,16 +33,22 @@ public class MusicAdapter extends ArrayAdapter<Music> {
 
         // Lookup view for data population
         ImageView imgv = (ImageView) convertView.findViewById(R.id.thumbnail);
-        int someresid = music.resID;
-        String a = "" + someresid;
-        Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(a, MediaStore.Images.Thumbnails.MICRO_KIND);
+        TextView name = (TextView) convertView.findViewById(R.id.name);
+
+        name.setText(music.name);
+        String pathtofile = "sdcard/DCIM/SharedFolder/" + music.name;
+
+        Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(pathtofile, MediaStore.Images.Thumbnails.MICRO_KIND);
         imgv.setImageBitmap(thumbnail);
 
 
-        TextView name = (TextView) convertView.findViewById(R.id.name);
-        name.setText(music.name);
         // Return the completed view to render on screen
         return convertView;
     }
+
+
+
+
+
 
 }

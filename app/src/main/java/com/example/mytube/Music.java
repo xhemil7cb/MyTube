@@ -6,12 +6,9 @@ import android.provider.MediaStore;
 
 public class Music {
     public String name;
-    public int resID;
 
-
-    public Music(String musicName, int resourceID) {
+    public Music(String musicName) {
         name = musicName;
-        resID = resourceID;
     }
 
 
