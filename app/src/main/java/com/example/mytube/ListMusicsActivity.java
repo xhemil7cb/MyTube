@@ -29,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -43,73 +44,63 @@ public class ListMusicsActivity extends AppCompatActivity {
     Field[] fields;
     private ListView lv;
     private Context context;
-
+    String path = "sdcard/DCIM/SharedFolder";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_some);
 
+        // Read and Write permissions
         checkPermission();
 
 
-        String path = "sdcard/DCIM/SharedFolder";
+        // Add just music names from a specific folder to an arrylist
         File f = new File(path);
         File[] filearray = f.listFiles();
-
-
         ArrayList<Music> Muzikat = new ArrayList<>();
-
         for (File file : filearray) {
             Music m = new Music(file.getName());
             Muzikat.add(m);
         }
 
+        // Fill the music adapter with the music names and form arraylist Muzilat
+        // Note to self: Music thumbnails will be generated in adapter
         MusicAdapter musicAdapter = new MusicAdapter(this, Muzikat);
         lv = findViewById(R.id.listView);
         lv.setAdapter(musicAdapter);
 
 
+        // When ListView item Music is clicked do this
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                String selectedItem = (String) parent.getItemAtPosition(position).toString();
-                Context context = getApplicationContext();
-                Toast toast = Toast.makeText(context, selectedItem + "", Toast.LENGTH_LONG);
-                toast.show();
+                String musicName = ((TextView) view.findViewById(R.id.name)).getText().toString();
+
+                Intent intended = new Intent(ListMusicsActivity.this, VideoPlalyerActivity.class);
+                intended.putExtra("Name", musicName);
+                ListMusicsActivity.this.startActivity(intended);
+
             }
         });
 
 
     }
 
-
+    // Read and Write premissions
     private void checkPermission() {
-        // Here, thisActivity is the current activity
+
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
-            // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.READ_EXTERNAL_STORAGE)) {
-
-                // Show an expanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
             } else {
-
-                // No explanation needed, we can request the permission.
-
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                         MY_PERMISSIONS_REQUEST_EXTERNAL_STORAGE);
-
-                // MY_PERMISSIONS_REQUEST_EXTERNAL_STORAGE is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
             }
         }
     }

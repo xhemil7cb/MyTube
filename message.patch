@@ -1,0 +1,611 @@
+Index: app/src/main/java/com/example/mytube/MainActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/mytube/MainActivity.java	(revision 86c44ca6f86875934e66444b49c4215ca86c143e)
++++ app/src/main/java/com/example/mytube/MainActivity.java	(date 1599391109508)
+@@ -17,40 +17,13 @@
+ 
+         setContentView(R.layout.activity_main);
+ 
+-
+-         /* //   Wroks like a charm *_*
+-        Intent myIntent = new Intent(MainActivity.this, VideoPlalyerActivity.class);
+-        //myIntent.putExtra("key", value); //Optional parameters
+-        MainActivity.this.startActivity(myIntent);
+-*/
+-
+-
+         Intent myIntent = new Intent(MainActivity.this, ListMusicsActivity.class);
+         MainActivity.this.startActivity(myIntent);
+ 
+-
+-
+-/*
+-           VideoView videoView = findViewById(R.id.vidview);
+-           Uri uri = Uri.parse(Environment.getExternalStorageDirectory()+"/Videos/blabla.mp4");
+-          // videoView.setVideoPath("/sdcard/Videos/blabla.mp4");
+-
+-
+-
+-        Context context = getApplicationContext();
+-        Toast toast = Toast.makeText(context,uri+"" ,Toast.LENGTH_LONG);
+-        toast.show();
+-
++    }
+ 
+-           videoView.setVideoURI(uri);
+-           videoView.requestFocus();
+-           videoView.start();
+ 
+-*/
+ 
+ 
+ 
+-    }
+-
+-
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/example/mytube/ListMusicsActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/mytube/ListMusicsActivity.java	(revision 86c44ca6f86875934e66444b49c4215ca86c143e)
++++ app/src/main/java/com/example/mytube/ListMusicsActivity.java	(date 1599392914921)
+@@ -29,6 +29,7 @@
+ import android.widget.ArrayAdapter;
+ import android.widget.ImageView;
+ import android.widget.ListView;
++import android.widget.TextView;
+ import android.widget.Toast;
+ 
+ 
+@@ -43,73 +44,63 @@
+     Field[] fields;
+     private ListView lv;
+     private Context context;
+-
++    String path = "sdcard/DCIM/SharedFolder";
+ 
+     @Override
+-    protected void onCreate(Bundle savedInstanceState) {
++    protected void onCreate(final Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+         setContentView(R.layout.activity_some);
+ 
++        // Read and Write permissions
+         checkPermission();
+ 
+ 
+-        String path = "sdcard/DCIM/SharedFolder";
++        // Add just music names from a specific folder to an arrylist
+         File f = new File(path);
+         File[] filearray = f.listFiles();
+-
+-
+         ArrayList<Music> Muzikat = new ArrayList<>();
+-
+         for (File file : filearray) {
+             Music m = new Music(file.getName());
+             Muzikat.add(m);
+         }
+ 
++        // Fill the music adapter with the music names and form arraylist Muzilat
++        // Note to self: Music thumbnails will be generated in adapter
+         MusicAdapter musicAdapter = new MusicAdapter(this, Muzikat);
+         lv = findViewById(R.id.listView);
+         lv.setAdapter(musicAdapter);
+ 
+ 
++        // When ListView item Music is clicked do this
+         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+             @Override
+             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+ 
+-                String selectedItem = (String) parent.getItemAtPosition(position).toString();
+-                Context context = getApplicationContext();
+-                Toast toast = Toast.makeText(context, selectedItem + "", Toast.LENGTH_LONG);
+-                toast.show();
++                String musicName = ((TextView) view.findViewById(R.id.name)).getText().toString();
++
++                Intent intended = new Intent(ListMusicsActivity.this, VideoPlalyerActivity.class);
++                intended.putExtra("Name", musicName);
++                ListMusicsActivity.this.startActivity(intended);
++
+             }
+         });
+ 
+ 
+     }
+ 
+-
++    // Read and Write premissions
+     private void checkPermission() {
+-        // Here, thisActivity is the current activity
++
+         if (ContextCompat.checkSelfPermission(this,
+                 Manifest.permission.READ_EXTERNAL_STORAGE)
+                 != PackageManager.PERMISSION_GRANTED) {
+ 
+-            // Should we show an explanation?
+             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                     Manifest.permission.READ_EXTERNAL_STORAGE)) {
+-
+-                // Show an expanation to the user *asynchronously* -- don't block
+-                // this thread waiting for the user's response! After the user
+-                // sees the explanation, try again to request the permission.
+-
+             } else {
+-
+-                // No explanation needed, we can request the permission.
+-
+                 ActivityCompat.requestPermissions(this,
+                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                         MY_PERMISSIONS_REQUEST_EXTERNAL_STORAGE);
+-
+-                // MY_PERMISSIONS_REQUEST_EXTERNAL_STORAGE is an
+-                // app-defined int constant. The callback method gets the
+-                // result of the request.
+             }
+         }
+     }
+Index: app/src/main/res/layout/listview_element.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/listview_element.xml	(revision 86c44ca6f86875934e66444b49c4215ca86c143e)
++++ app/src/main/res/layout/listview_element.xml	(date 1599392914911)
+@@ -1,16 +1,25 @@
+ <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_width="match_parent"
+-    android:layout_height="match_parent">
++    android:id="@+id/container"
++    android:layout_height="wrap_content">
+ 
+     <ImageView
+         android:id="@+id/thumbnail"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+-        android:src="@drawable/pause" />
++        android:layout_gravity="center" />
+ 
+     <TextView
+         android:id="@+id/name"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+-        android:text="HomeTown" />
+-</LinearLayout>
+\ No newline at end of file
++        android:layout_gravity="center"
++        android:text="Moj e miraaaaa"
++        android:textSize="50dp" />
++
++    <ImageView
++        android:id="@+id/playingIndicator"
++        android:layout_width="20dp"
++        android:layout_height="20dp"
++        android:src="@drawable/play" />
++</LinearLayout>
+Index: app/src/main/java/com/example/mytube/VideoPlalyerActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/mytube/VideoPlalyerActivity.java	(revision 86c44ca6f86875934e66444b49c4215ca86c143e)
++++ app/src/main/java/com/example/mytube/VideoPlalyerActivity.java	(date 1599392914933)
+@@ -3,27 +3,30 @@
+ import androidx.appcompat.app.AppCompatActivity;
+ 
+ import android.content.Context;
++import android.content.Intent;
+ import android.media.MediaPlayer;
+ import android.net.Uri;
+ import android.os.Bundle;
+ import android.os.Handler;
+ import android.view.View;
++import android.widget.AdapterView;
++import android.widget.FrameLayout;
+ import android.widget.ImageButton;
+ import android.widget.LinearLayout;
++import android.widget.ListView;
+ import android.widget.MediaController;
++import android.widget.TextView;
+ import android.widget.Toast;
+ import android.widget.VideoView;
+ 
++import java.io.File;
+ import java.lang.reflect.Field;
++import java.util.ArrayList;
+ 
+ public class VideoPlalyerActivity extends AppCompatActivity {
+ 
+     static Handler handler = new Handler();
+     boolean isPlaying = true;
+-    Field[] fields;
+-    int[] resIDs;
+-    int playingNow = 0;
+-    boolean loop = false;   // the logic is implemented just missing UI elemnt
+ 
+ 
+     @Override
+@@ -31,28 +34,23 @@
+         super.onCreate(savedInstanceState);
+         setContentView(R.layout.activity_video_plalyer);
+ 
+-
+-        HideCntrols();
+-
+-        LinearLayout musiclist = findViewById(R.id.musiclistontainer);
+-        musiclist.setVisibility(View.INVISIBLE);
+-
++        // This Activity is called only from LisMusicActivity as I add more features I should edit this
++        Intent intent = getIntent();
++        String MusicToPlay = intent.getStringExtra("Name");
+ 
+         // initiate videoviev and media controller
+         final VideoView videoView = findViewById(R.id.vidview);
+         final MediaController mediaController = new MediaController(this);
+         mediaController.setAnchorView(videoView);
+ 
+-        // Fill array with video id's from raw
+-        GetRawResources();
+-        int resID = resIDs[playingNow];
++        // Hide mediaController and other controls I added after few sec
++        HideCntrols();
+ 
+-        Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + resID);
+-        videoView.setVideoURI(uri);
++        // Explanation not needed :D
++        videoView.setVideoPath("sdcard/DCIM/SharedFolder/" + MusicToPlay);
+         videoView.requestFocus();
+         videoView.start();
+         videoView.setMediaController(mediaController);
+-
+         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+             final Context context = getApplicationContext();
+ 
+@@ -64,29 +62,23 @@
+             }
+         });
+ 
+-
+         final Context context = getApplicationContext();
+-
+         videoView.setOnTouchListener(new OnSwipeTouchListener(VideoPlalyerActivity.this) {
+             public void onSwipeTop() {
+-                Toast.makeText(context, "top", Toast.LENGTH_SHORT).show();
+-
++                //   Toast.makeText(context, "top", Toast.LENGTH_SHORT).show();
+             }
+ 
+             public void onSwipeRight() {
+-                Toast.makeText(context, "right", Toast.LENGTH_SHORT).show();
+-                mediaController.show(5000);
++                LinearLayout musiclistontainer = findViewById(R.id.musiclistontainer);
++                musiclistontainer.setVisibility(View.VISIBLE);
+             }
+ 
+             public void onSwipeLeft() {
+ 
+-                Toast.makeText(context, "left", Toast.LENGTH_SHORT).show();
+-                mediaController.show(5000);
+             }
+ 
+             public void onSwipeBottom() {
+-                Toast.makeText(context, "bottom", Toast.LENGTH_SHORT).show();
+-                mediaController.show(5000);
++
+             }
+ 
+             public void onNoSwipe() {
+@@ -97,34 +89,11 @@
+ 
+         });
+ 
+-
+-        // Initiate my own media controller buttons
+-        ImageButton playpauseimgbutton = findViewById(R.id.playpauseimagebuton);
+-        playpauseimgbutton.setOnClickListener(new View.OnClickListener() {
+-            @Override
+-            public void onClick(View view) {
+-                PlayPauseClick();
+-            }
+-        });
++        // Extra Controls that I want in videoview
++        initiateMyVideoControls();
+ 
+-        ImageButton nextimgbutton = findViewById(R.id.right);
+-        nextimgbutton.setOnClickListener(new View.OnClickListener() {
+-            @Override
+-            public void onClick(View view) {
+-                NextClick();
+-            }
+-        });
+ 
+-        ImageButton previmgbutton = findViewById(R.id.left);
+-        previmgbutton.setOnClickListener(new View.OnClickListener() {
+-            @Override
+-            public void onClick(View view) {
+-                PrevClick();
+-            }
+-        });
+-
+-
+-        // remove prev handler calls then call to Hide playpausebutton after 3sec
++        // remove prev handler calls then call to Hide playpausebutton after 5 sec
+         handler.postDelayed(new Runnable() {
+             @Override
+             public void run() {
+@@ -132,35 +101,24 @@
+             }
+         }, 5 * 1000);
+ 
++        ListView lv = findViewById(R.id.inPalyListView);
++        LinearLayout l = findViewById(R.id.musiclistontainer);
++        GenerateListViewAdapter(lv, videoView, l);
+ 
+     }
+ 
+ 
+-    void GetRawResources() {
+-
+-        fields = R.raw.class.getFields();
+-        resIDs = new int[fields.length];
+ 
+ 
+-        for (int i = 0; i < fields.length; i++) {
+-            try {
+-                resIDs[i] = (fields[i].getInt(fields[i]));
+-            } catch (IllegalAccessException e) {
+-                e.printStackTrace();
+-            }
+-        }
+-
+-
+-    /*   for debug puprpurses
++    /*  Keep this for debug puprpurses
+         Context context = getApplicationContext();
+         Toast toast = Toast.makeText(context,resIDs.length+":"+fields.length ,Toast.LENGTH_LONG);
+         toast.show();
+     */
+-    }
++
+ 
+ 
+     void VideoClick() {
+-
+         LinearLayout cntrlsLayout = findViewById(R.id.cntrols);
+         cntrlsLayout.setVisibility(View.VISIBLE);
+ 
+@@ -173,24 +131,9 @@
+                 HideCntrols();
+             }
+         }, 5 * 1000);
+-
+     }
+ 
+-    void NextClick() {
+-
+-        if (playingNow < resIDs.length - 1) {
+-            VideoView videoView = findViewById(R.id.vidview);
+-            playingNow++;
+-            Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + resIDs[playingNow]);
+-            videoView.setVideoURI(uri);
+-        } else if (loop) {
+-            VideoView videoView = findViewById(R.id.vidview);
+-            playingNow = 0;
+-            Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + resIDs[playingNow]);
+-            videoView.setVideoURI(uri);
+-        }
+-
+-
++    void NextClick() {   // Next music code to be added
+         // remove prev calls
+         handler.removeCallbacksAndMessages(null);
+         //final Handler handler =new Handler();
+@@ -202,21 +145,7 @@
+         }, 5 * 1000);
+     }
+ 
+-    void PrevClick() {
+-
+-        if (playingNow > 0) {
+-            VideoView videoView = findViewById(R.id.vidview);
+-            playingNow--;
+-            Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + resIDs[playingNow]);
+-            videoView.setVideoURI(uri);
+-        } else if (loop) {
+-            VideoView videoView = findViewById(R.id.vidview);
+-            playingNow = resIDs.length - 1;  // set playingnow to the last element
+-            Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + resIDs[playingNow]);
+-            videoView.setVideoURI(uri);
+-        }
+-
+-
++    void PrevClick() {  // prev music code to be added
+         // remove prev calls
+         handler.removeCallbacksAndMessages(null);
+         //final Handler handler =new Handler();
+@@ -226,14 +155,12 @@
+                 HideCntrols();
+             }
+         }, 5 * 1000);
+-
+     }
+ 
+ 
+-    void PlayPauseClick() {
++    void PlayPauseClick() {  // It looks good atm
+         VideoView videoView = findViewById(R.id.vidview);
+         ImageButton imageButton = findViewById(R.id.playpauseimagebuton);
+-
+         if (isPlaying) {
+             videoView.pause();
+             isPlaying = false;
+@@ -253,14 +180,69 @@
+             }
+         }, 5 * 1000);
+ 
+-    }
++    }  // This is done
+ 
+ 
+     void HideCntrols() {
+-
+         LinearLayout cntrlsLayout = findViewById(R.id.cntrols);
+         cntrlsLayout.setVisibility(View.INVISIBLE);
++    }  // No need to mess with this either
++
++
++    void GenerateListViewAdapter(final ListView lv, final VideoView v, final LinearLayout linearLayout) {
++
++        // Send this in MainAcitivity make static so we dont have to call same thing a milion times
++        ArrayList<Music> music = new ArrayList<Music>();
++        final String path = "sdcard/DCIM/SharedFolder";
++        File f = new File(path);
++        File[] filearray = f.listFiles();
++        ArrayList<Music> Muzikat = new ArrayList<>();
++
++        for (File file : filearray) {
++            Music m = new Music(file.getName());
++            Muzikat.add(m);
++        }
++
++        MusicAdapter musicAdapter = new MusicAdapter(this, Muzikat);
++        lv.setAdapter(musicAdapter);
++
++        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
++            @Override
++            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+ 
++                String musicName = ((TextView) view.findViewById(R.id.name)).getText().toString();
++
++                v.setVideoPath("sdcard/DCIM/SharedFolder/" + musicName);
++                linearLayout.setVisibility(View.INVISIBLE);
++            }
++        });
+     }
++
++
++    void initiateMyVideoControls() {
++        // Initiate my own media controller buttons
++        ImageButton playpauseimgbutton = findViewById(R.id.playpauseimagebuton);
++        playpauseimgbutton.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View view) {
++                PlayPauseClick();
++            }
++        });
++        ImageButton nextimgbutton = findViewById(R.id.right);
++        nextimgbutton.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View view) {
++                NextClick();
++            }
++        });
++        ImageButton previmgbutton = findViewById(R.id.left);
++        previmgbutton.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View view) {
++                PrevClick();
++            }
++        });
++    }  // PlayPause Next and Prev Initialisations only  dont mess till you need to add more buttons
++
+ 
+ }
+\ No newline at end of file
+Index: app/src/main/res/layout/activity_video_plalyer.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_video_plalyer.xml	(revision 86c44ca6f86875934e66444b49c4215ca86c143e)
++++ app/src/main/res/layout/activity_video_plalyer.xml	(date 1599392914944)
+@@ -26,37 +26,6 @@
+                 android:layout_width="fill_parent"
+                 android:layout_height="fill_parent"
+                 android:layout_gravity="center" />
+-
+-            <LinearLayout
+-                android:id="@+id/musiclistontainer"
+-                android:layout_width="match_parent"
+-                android:layout_height="match_parent"
+-                android:background="#D9000000">
+-
+-
+-                <LinearLayout
+-                    android:id="@+id/file1"
+-                    android:layout_width="match_parent"
+-                    android:layout_height="wrap_content"
+-                    android:orientation="horizontal">
+-
+-                    <ImageView
+-                        android:id="@+id/tumbnail"
+-                        android:layout_width="150dp"
+-                        android:layout_height="150dp"
+-                        android:layout_margin="50dp"
+-                        android:src="@drawable/pause" />
+-
+-                    <TextView
+-                        android:id="@+id/text"
+-                        android:layout_width="match_parent"
+-                        android:layout_height="match_parent"
+-                        android:gravity="center_vertical"
+-                        android:text="Braziliane"
+-                        android:textSize="100dp" />
+-                </LinearLayout>
+-            </LinearLayout>
+-
+             <LinearLayout
+                 android:id="@+id/cntrols"
+                 android:layout_width="match_parent"
+@@ -92,6 +61,21 @@
+ 
+         </FrameLayout>
+ 
++        <LinearLayout
++            android:id="@+id/musiclistontainer"
++            android:layout_width="match_parent"
++            android:layout_height="match_parent"
++            android:background="#D9000000"
++            android:orientation="horizontal"
++            android:visibility="gone">
++
++            <ListView
++                android:id="@+id/inPalyListView"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content" />
++
++        </LinearLayout>
++
+     </RelativeLayout>
+ 
+ 
+Index: app/src/main/java/com/example/mytube/MusicAdapter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/mytube/MusicAdapter.java	(revision 86c44ca6f86875934e66444b49c4215ca86c143e)
++++ app/src/main/java/com/example/mytube/MusicAdapter.java	(date 1599391357960)
+@@ -25,13 +25,14 @@
+     public View getView(int position, View convertView, ViewGroup parent) {
+         // Get the data item for this position
+         Music music = getItem(position);
++
+         // Check if an existing view is being reused, otherwise inflate the view
+         if (convertView == null) {
+             convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_element, parent, false);
+         }
+ 
+ 
+-        // Lookup view for data population
++        // Set the music name and generate a thumbnail for the given music
+         ImageView imgv = (ImageView) convertView.findViewById(R.id.thumbnail);
+         TextView name = (TextView) convertView.findViewById(R.id.name);
+ 

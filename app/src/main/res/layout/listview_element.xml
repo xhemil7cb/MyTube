@@ -1,16 +1,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:id="@+id/container"
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/thumbnail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/pause" />
+        android:layout_gravity="center" />
 
     <TextView
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="HomeTown" />
+        android:layout_gravity="center"
+        android:text="Moj e miraaaaa"
+        android:textSize="50dp" />
+
+    <ImageView
+        android:id="@+id/playingIndicator"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/play" />
 </LinearLayout>

@@ -3,27 +3,30 @@ package com.example.mytube;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.MediaController;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import java.io.File;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 public class VideoPlalyerActivity extends AppCompatActivity {
 
     static Handler handler = new Handler();
     boolean isPlaying = true;
-    Field[] fields;
-    int[] resIDs;
-    int playingNow = 0;
-    boolean loop = false;   // the logic is implemented just missing UI elemnt
 
 
     @Override
@@ -31,28 +34,23 @@ public class VideoPlalyerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_plalyer);
 
-
-        HideCntrols();
-
-        LinearLayout musiclist = findViewById(R.id.musiclistontainer);
-        musiclist.setVisibility(View.INVISIBLE);
-
+        // This Activity is called only from LisMusicActivity as I add more features I should edit this
+        Intent intent = getIntent();
+        String MusicToPlay = intent.getStringExtra("Name");
 
         // initiate videoviev and media controller
         final VideoView videoView = findViewById(R.id.vidview);
         final MediaController mediaController = new MediaController(this);
         mediaController.setAnchorView(videoView);
 
-        // Fill array with video id's from raw
-        GetRawResources();
-        int resID = resIDs[playingNow];
+        // Hide mediaController and other controls I added after few sec
+        HideCntrols();
 
-        Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + resID);
-        videoView.setVideoURI(uri);
+        // Explanation not needed :D
+        videoView.setVideoPath("sdcard/DCIM/SharedFolder/" + MusicToPlay);
         videoView.requestFocus();
         videoView.start();
         videoView.setMediaController(mediaController);
-
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             final Context context = getApplicationContext();
 
@@ -64,29 +62,23 @@ public class VideoPlalyerActivity extends AppCompatActivity {
             }
         });
 
-
         final Context context = getApplicationContext();
-
         videoView.setOnTouchListener(new OnSwipeTouchListener(VideoPlalyerActivity.this) {
             public void onSwipeTop() {
-                Toast.makeText(context, "top", Toast.LENGTH_SHORT).show();
-
+                //   Toast.makeText(context, "top", Toast.LENGTH_SHORT).show();
             }
 
             public void onSwipeRight() {
-                Toast.makeText(context, "right", Toast.LENGTH_SHORT).show();
-                mediaController.show(5000);
+                LinearLayout musiclistontainer = findViewById(R.id.musiclistontainer);
+                musiclistontainer.setVisibility(View.VISIBLE);
             }
 
             public void onSwipeLeft() {
 
-                Toast.makeText(context, "left", Toast.LENGTH_SHORT).show();
-                mediaController.show(5000);
             }
 
             public void onSwipeBottom() {
-                Toast.makeText(context, "bottom", Toast.LENGTH_SHORT).show();
-                mediaController.show(5000);
+
             }
 
             public void onNoSwipe() {
@@ -97,34 +89,11 @@ public class VideoPlalyerActivity extends AppCompatActivity {
 
         });
 
-
-        // Initiate my own media controller buttons
-        ImageButton playpauseimgbutton = findViewById(R.id.playpauseimagebuton);
-        playpauseimgbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                PlayPauseClick();
-            }
-        });
-
-        ImageButton nextimgbutton = findViewById(R.id.right);
-        nextimgbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NextClick();
-            }
-        });
-
-        ImageButton previmgbutton = findViewById(R.id.left);
-        previmgbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                PrevClick();
-            }
-        });
+        // Extra Controls that I want in videoview
+        initiateMyVideoControls();
 
 
-        // remove prev handler calls then call to Hide playpausebutton after 3sec
+        // remove prev handler calls then call to Hide playpausebutton after 5 sec
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -132,35 +101,24 @@ public class VideoPlalyerActivity extends AppCompatActivity {
             }
         }, 5 * 1000);
 
+        ListView lv = findViewById(R.id.inPalyListView);
+        LinearLayout l = findViewById(R.id.musiclistontainer);
+        GenerateListViewAdapter(lv, videoView, l);
 
     }
 
 
-    void GetRawResources() {
-
-        fields = R.raw.class.getFields();
-        resIDs = new int[fields.length];
 
 
-        for (int i = 0; i < fields.length; i++) {
-            try {
-                resIDs[i] = (fields[i].getInt(fields[i]));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-    /*   for debug puprpurses
+    /*  Keep this for debug puprpurses
         Context context = getApplicationContext();
         Toast toast = Toast.makeText(context,resIDs.length+":"+fields.length ,Toast.LENGTH_LONG);
         toast.show();
     */
-    }
+
 
 
     void VideoClick() {
-
         LinearLayout cntrlsLayout = findViewById(R.id.cntrols);
         cntrlsLayout.setVisibility(View.VISIBLE);
 
@@ -173,24 +131,9 @@ public class VideoPlalyerActivity extends AppCompatActivity {
                 HideCntrols();
             }
         }, 5 * 1000);
-
     }
 
-    void NextClick() {
-
-        if (playingNow < resIDs.length - 1) {
-            VideoView videoView = findViewById(R.id.vidview);
-            playingNow++;
-            Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + resIDs[playingNow]);
-            videoView.setVideoURI(uri);
-        } else if (loop) {
-            VideoView videoView = findViewById(R.id.vidview);
-            playingNow = 0;
-            Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + resIDs[playingNow]);
-            videoView.setVideoURI(uri);
-        }
-
-
+    void NextClick() {   // Next music code to be added
         // remove prev calls
         handler.removeCallbacksAndMessages(null);
         //final Handler handler =new Handler();
@@ -202,21 +145,7 @@ public class VideoPlalyerActivity extends AppCompatActivity {
         }, 5 * 1000);
     }
 
-    void PrevClick() {
-
-        if (playingNow > 0) {
-            VideoView videoView = findViewById(R.id.vidview);
-            playingNow--;
-            Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + resIDs[playingNow]);
-            videoView.setVideoURI(uri);
-        } else if (loop) {
-            VideoView videoView = findViewById(R.id.vidview);
-            playingNow = resIDs.length - 1;  // set playingnow to the last element
-            Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + resIDs[playingNow]);
-            videoView.setVideoURI(uri);
-        }
-
-
+    void PrevClick() {  // prev music code to be added
         // remove prev calls
         handler.removeCallbacksAndMessages(null);
         //final Handler handler =new Handler();
@@ -226,14 +155,12 @@ public class VideoPlalyerActivity extends AppCompatActivity {
                 HideCntrols();
             }
         }, 5 * 1000);
-
     }
 
 
-    void PlayPauseClick() {
+    void PlayPauseClick() {  // It looks good atm
         VideoView videoView = findViewById(R.id.vidview);
         ImageButton imageButton = findViewById(R.id.playpauseimagebuton);
-
         if (isPlaying) {
             videoView.pause();
             isPlaying = false;
@@ -253,14 +180,69 @@ public class VideoPlalyerActivity extends AppCompatActivity {
             }
         }, 5 * 1000);
 
-    }
+    }  // This is done
 
 
     void HideCntrols() {
-
         LinearLayout cntrlsLayout = findViewById(R.id.cntrols);
         cntrlsLayout.setVisibility(View.INVISIBLE);
+    }  // No need to mess with this either
 
+
+    void GenerateListViewAdapter(final ListView lv, final VideoView v, final LinearLayout linearLayout) {
+
+        // Send this in MainAcitivity make static so we dont have to call same thing a milion times
+        ArrayList<Music> music = new ArrayList<Music>();
+        final String path = "sdcard/DCIM/SharedFolder";
+        File f = new File(path);
+        File[] filearray = f.listFiles();
+        ArrayList<Music> Muzikat = new ArrayList<>();
+
+        for (File file : filearray) {
+            Music m = new Music(file.getName());
+            Muzikat.add(m);
+        }
+
+        MusicAdapter musicAdapter = new MusicAdapter(this, Muzikat);
+        lv.setAdapter(musicAdapter);
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String musicName = ((TextView) view.findViewById(R.id.name)).getText().toString();
+
+                v.setVideoPath("sdcard/DCIM/SharedFolder/" + musicName);
+                linearLayout.setVisibility(View.INVISIBLE);
+            }
+        });
     }
+
+
+    void initiateMyVideoControls() {
+        // Initiate my own media controller buttons
+        ImageButton playpauseimgbutton = findViewById(R.id.playpauseimagebuton);
+        playpauseimgbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PlayPauseClick();
+            }
+        });
+        ImageButton nextimgbutton = findViewById(R.id.right);
+        nextimgbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NextClick();
+            }
+        });
+        ImageButton previmgbutton = findViewById(R.id.left);
+        previmgbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PrevClick();
+            }
+        });
+    }  // PlayPause Next and Prev Initialisations only  dont mess till you need to add more buttons
+
 
 }

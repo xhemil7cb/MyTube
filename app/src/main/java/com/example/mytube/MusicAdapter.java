@@ -25,13 +25,14 @@ public class MusicAdapter extends ArrayAdapter<Music> {
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
         Music music = getItem(position);
+
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_element, parent, false);
         }
 
 
-        // Lookup view for data population
+        // Set the music name and generate a thumbnail for the given music
         ImageView imgv = (ImageView) convertView.findViewById(R.id.thumbnail);
         TextView name = (TextView) convertView.findViewById(R.id.name);
 
