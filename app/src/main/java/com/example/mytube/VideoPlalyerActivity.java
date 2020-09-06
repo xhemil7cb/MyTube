@@ -8,13 +8,16 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.service.autofill.OnClickAction;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.MediaController;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -27,7 +30,7 @@ public class VideoPlalyerActivity extends AppCompatActivity {
 
     static Handler handler = new Handler();
     boolean isPlaying = true;
-
+    VideoView videoView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +42,7 @@ public class VideoPlalyerActivity extends AppCompatActivity {
         String MusicToPlay = intent.getStringExtra("Name");
 
         // initiate videoviev and media controller
-        final VideoView videoView = findViewById(R.id.vidview);
+        videoView = findViewById(R.id.vidview);
         final MediaController mediaController = new MediaController(this);
         mediaController.setAnchorView(videoView);
 
@@ -69,8 +72,10 @@ public class VideoPlalyerActivity extends AppCompatActivity {
             }
 
             public void onSwipeRight() {
-                LinearLayout musiclistontainer = findViewById(R.id.musiclistontainer);
-                musiclistontainer.setVisibility(View.VISIBLE);
+                RelativeLayout listLayout = findViewById(R.id.listlayout);
+                listLayout.setVisibility(View.VISIBLE);
+
+
             }
 
             public void onSwipeLeft() {
@@ -102,7 +107,7 @@ public class VideoPlalyerActivity extends AppCompatActivity {
         }, 5 * 1000);
 
         ListView lv = findViewById(R.id.inPalyListView);
-        LinearLayout l = findViewById(R.id.musiclistontainer);
+        RelativeLayout l = findViewById(R.id.listlayout);
         GenerateListViewAdapter(lv, videoView, l);
 
     }
@@ -189,7 +194,7 @@ public class VideoPlalyerActivity extends AppCompatActivity {
     }  // No need to mess with this either
 
 
-    void GenerateListViewAdapter(final ListView lv, final VideoView v, final LinearLayout linearLayout) {
+    void GenerateListViewAdapter(final ListView lv, final VideoView v, final RelativeLayout relativeLayout) {
 
         // Send this in MainAcitivity make static so we dont have to call same thing a milion times
         ArrayList<Music> music = new ArrayList<Music>();
@@ -213,7 +218,17 @@ public class VideoPlalyerActivity extends AppCompatActivity {
                 String musicName = ((TextView) view.findViewById(R.id.name)).getText().toString();
 
                 v.setVideoPath("sdcard/DCIM/SharedFolder/" + musicName);
-                linearLayout.setVisibility(View.INVISIBLE);
+                relativeLayout.setVisibility(View.GONE);
+            }
+        });
+
+
+        final Button cancel = findViewById(R.id.cancel);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                relativeLayout.setVisibility(View.GONE);
+
             }
         });
     }

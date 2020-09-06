@@ -1,11 +1,8 @@
 package com.example.mytube;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
-import android.net.Uri;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +25,7 @@ public class MusicAdapter extends ArrayAdapter<Music> {
 
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_element, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_row, parent, false);
         }
 
 

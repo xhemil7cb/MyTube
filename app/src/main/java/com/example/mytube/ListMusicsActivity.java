@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -77,6 +78,8 @@ public class ListMusicsActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 String musicName = ((TextView) view.findViewById(R.id.name)).getText().toString();
+                ImageView iv = ((ImageView) view.findViewById(R.id.playingIndicator));
+                iv.setVisibility(View.VISIBLE);
 
                 Intent intended = new Intent(ListMusicsActivity.this, VideoPlalyerActivity.class);
                 intended.putExtra("Name", musicName);
