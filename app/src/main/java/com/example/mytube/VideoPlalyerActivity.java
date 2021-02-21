@@ -1,18 +1,13 @@
 package com.example.mytube;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.service.autofill.OnClickAction;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -22,8 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 public class VideoPlalyerActivity extends AppCompatActivity {
@@ -50,7 +46,7 @@ public class VideoPlalyerActivity extends AppCompatActivity {
         HideCntrols();
 
         // Explanation not needed :D
-        videoView.setVideoPath("sdcard/DCIM/SharedFolder/" + MusicToPlay);
+        videoView.setVideoPath( "/mnt/sdcard/MyTubeFiles/"+ MusicToPlay);
         videoView.requestFocus();
         videoView.start();
         videoView.setMediaController(mediaController);
@@ -65,34 +61,7 @@ public class VideoPlalyerActivity extends AppCompatActivity {
             }
         });
 
-        final Context context = getApplicationContext();
-        videoView.setOnTouchListener(new OnSwipeTouchListener(VideoPlalyerActivity.this) {
-            public void onSwipeTop() {
-                //   Toast.makeText(context, "top", Toast.LENGTH_SHORT).show();
-            }
 
-            public void onSwipeRight() {
-                RelativeLayout listLayout = findViewById(R.id.listlayout);
-                listLayout.setVisibility(View.VISIBLE);
-
-
-            }
-
-            public void onSwipeLeft() {
-
-            }
-
-            public void onSwipeBottom() {
-
-            }
-
-            public void onNoSwipe() {
-                Toast.makeText(context, "Click", Toast.LENGTH_SHORT).show();
-                VideoClick();
-                mediaController.show(5000);
-            }
-
-        });
 
         // Extra Controls that I want in videoview
         initiateMyVideoControls();
@@ -198,7 +167,7 @@ public class VideoPlalyerActivity extends AppCompatActivity {
 
         // Send this in MainAcitivity make static so we dont have to call same thing a milion times
         ArrayList<Music> music = new ArrayList<Music>();
-        final String path = "sdcard/DCIM/SharedFolder";
+        final String path = "/mnt/sdcard/MyTubeFiles/";
         File f = new File(path);
         File[] filearray = f.listFiles();
         ArrayList<Music> Muzikat = new ArrayList<>();
@@ -217,7 +186,7 @@ public class VideoPlalyerActivity extends AppCompatActivity {
 
                 String musicName = ((TextView) view.findViewById(R.id.name)).getText().toString();
 
-                v.setVideoPath("sdcard/DCIM/SharedFolder/" + musicName);
+                v.setVideoPath("/mnt/sdcard/MyTubeFiles/"+ musicName);
                 relativeLayout.setVisibility(View.GONE);
             }
         });

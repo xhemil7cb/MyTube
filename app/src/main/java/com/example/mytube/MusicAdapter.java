@@ -34,7 +34,7 @@ public class MusicAdapter extends ArrayAdapter<Music> {
         TextView name = (TextView) convertView.findViewById(R.id.name);
 
         name.setText(music.name);
-        String pathtofile = "sdcard/DCIM/SharedFolder/" + music.name;
+        String pathtofile = "/mnt/sdcard/MyTubeFiles/" + music.name;
 
         Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(pathtofile, MediaStore.Images.Thumbnails.MICRO_KIND);
         imgv.setImageBitmap(thumbnail);
